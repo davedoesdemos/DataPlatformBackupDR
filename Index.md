@@ -3,8 +3,8 @@
 
 # Contents
 
-[introduction](#Introduction)
-  [Archive](#Archive)
+*[Introduction](#Introduction)
+**[Archive](#Archive)
 
 # <a name="Introduction"></a>Introduction
 This guide aims to show effective ways of backing up and recovering a cloud data platform, as well as how to recover in a regional outage or disaster recovery situation. In this instance cloud data platform refers specifically to cloud data warehousing using data lake and Data Factory such as in the image below.
