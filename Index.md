@@ -4,6 +4,7 @@
 # Contents
 
 * [Introduction](#Introduction)
+  * [Cloud Compute](#CloudCompute)
   * [Archive](#IntroductionArchive)
   * [Disaster Recovery](#IntroductionDisasterRecovery)
   * [Service Availability](#IntroductionServiceAvailability)
@@ -15,16 +16,16 @@
     * [Backup](#IngestBackup)
     * [Disaster Recovery](#IngestDisasterRecovery)
   * [Store](#Store)
-    * [Bakcup](#StoreBackup)
+    * [Backup](#StoreBackup)
     * [Disaster Recovery](#StoreDisasterRecovery)
   * [Prep and Train](#PrepAndTrain)
-    * [Bakcup](#PrepAndTrainBackup)
+    * [Backup](#PrepAndTrainBackup)
     * [Disaster Recovery](#PrepAndTrainDisasterRecovery)
   * [Model](#Model)
-    * [Bakcup](#ModelBackup)
+    * [Backup](#ModelBackup)
     * [Disaster Recovery](#ModelDisasterRecovery)
   * [Serve](#Serve)
-    * [Bakcup](#ServeBackup)
+    * [Backup](#ServeBackup)
     * [Disaster Recovery](#ServeDisasterRecovery)
 * [SQL](#SQL)
   * [SQL Managed Instance](#SQLSQLManagedInstance)
@@ -48,6 +49,9 @@
 # <a name="Introduction"></a>Introduction
 This guide aims to show effective ways of backing up and recovering a cloud data platform, as well as how to recover in a regional outage or disaster recovery situation. In this instance cloud data platform refers specifically to cloud data warehousing using data lake and Data Factory such as in the image below.
 ![Data Platform Overview](images/DataMarts.png)
+
+## <a name="CloudCompute"></a>Cloud Compute
+Understanding how to create a suitable strategy in the cloud requires an understanding of cloud compute itself. Your strategy will be a mixture of requirements and cost/performance. In the cloud, compute tends to be expensive while storage is cheap. As such it may often be more suitable to store multiple full and complete copies of data rather than incremental backup, or recreating data. 
 
 ## <a name="IntroductionArchive"></a>Archive
 Data platforms are often used for longer term retention of information which may have been removed from systems of record. For instance, consolidated sales information may be kept long term in a data platform even when the original data is removed. In this scenario, treat the archive data as a system in its own right and not as a backup of source data. This means you should take backups or snapshots of the archive data, as well as potentially replicating the archive to a recovery site.
@@ -82,16 +86,16 @@ The questions to ask here are:
 * Will it cost less to back up this data than to re-create it?
 * Will it take longer to re-create than my RTO allows?
 
-### <a name="StoreBackup"></a>Bakcup
+### <a name="StoreBackup"></a>Backup
 ### <a name="StoreDisasterRecovery"></a>Disaster Recovery
 ## <a name="PrepAndTrain"></a>Prep and Train
-### <a name="PrepAndTrainBackup"></a>Bakcup
+### <a name="PrepAndTrainBackup"></a>Backup
 ### <a name="PrepAndTrainDisasterRecovery"></a>Disaster Recovery
 ## <a name="Model"></a>Model
-### <a name="ModelBackup"></a>Bakcup
+### <a name="ModelBackup"></a>Backup
 ### <a name="ModelDisasterRecovery"></a>Disaster Recovery
 ## <a name="Serve"></a>Serve
-### <a name="ServeBackup"></a>Bakcup
+### <a name="ServeBackup"></a>Backup
 ### <a name="ServeDisasterRecovery"></a>Disaster Recovery
 # <a name="SQL"></a>SQL
 ## <a name="SQLSQLManagedInstance"></a>SQL Managed Instance
@@ -105,6 +109,7 @@ Second copy
 # <a name="DataLake"></a>Data Lake
 ## <a name="DataLakeStorageAccount"></a>Storage Account (blob)
 [https://azure.microsoft.com/en-us/services/storage/blobs/](https://azure.microsoft.com/en-us/services/storage/blobs/)
+
 Hot, cool, archive
 To read data in Archive storage, you must first change the tier of the blob to Hot or Cool. This process is known as rehydration and can take up to 15 hours to complete. Large blob sizes are recommended for optimal performance. Rehydrating several small blobs concurrently may add additional time.
 
@@ -130,6 +135,7 @@ Data lives on lake
 Git integration for notebooks
 # <a name="SQLDataWarehouse"></a>SQL Data Warehouse
 [https://docs.microsoft.com/en-us/azure/sql-data-warehouse/backup-and-restore](https://docs.microsoft.com/en-us/azure/sql-data-warehouse/backup-and-restore)
+
 auto snapshots
 user snapshots
 geo replication
