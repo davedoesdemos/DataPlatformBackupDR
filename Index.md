@@ -6,6 +6,7 @@
 * [Introduction](#Introduction)
   * [Cloud Compute](#CloudCompute)
   * [Archive](#IntroductionArchive)
+  * [Backup and Restore](#IntroductionBackupAndRestore)
   * [Disaster Recovery](#IntroductionDisasterRecovery)
   * [Service Availability](#IntroductionServiceAvailability)
 * [General Requirements](#GeneralRequirements)
@@ -55,19 +56,31 @@ Understanding how to create a suitable strategy in the cloud requires an underst
 
 ## <a name="IntroductionArchive"></a>Archive
 Data platforms are often used for longer term retention of information which may have been removed from systems of record. For instance, consolidated sales information may be kept long term in a data platform even when the original data is removed. In this scenario, treat the archive data as a system in its own right and not as a backup of source data. This means you should take backups or snapshots of the archive data, as well as potentially replicating the archive to a recovery site.
-Backup and Restore
-Cloud platform backup and recovery is often a big change to traditional off-site tape backup. Firstly, we need to be clear of the purposes of the backup. The traditional tape solution was used for everything since it was the only avenue to any recovery. As such it included recovering data, recovering systems, and recovering during a DR scenario. In the cloud the connected nature of the platform, and the on-demand provisioning, change this viewpoint. Since we are now able to provision on demand it is generally preferable to store the deployment configuration rather than a full system image. Since we have multiple, well connected regions it is preferable to have a cold, warm, or hot standby site rather than recover from scratch in a disaster. As such, backup may be seen as primarily a way to recover data following corruption or accidental modification. Scenarios to consider for backup are:
+Archival of data will generally be either for compliance, or for historical data purposes. Before creating an archive you should have a clear reason for keeping data, as with all lifecycle management processes. Also ensure that you understand when the data will be removed and put in place processes to remove it at that time.
+
+## <a name="IntroductionBackupAndRestore"></a>Backup and Restore
+Backup involves creating recovery points which can be used to restore data to a previous version should anything go wrong. Backup does not require data to be copied elsewhere or taken off site, but this is often done. Where data is copied to a secondary location, this is considered a disaster recovery solution for the backup system, not part of the backup system itself.
+Cloud platform backup and recovery is often a big change to traditional off-site tape backup. Firstly, we need to be clear of the purposes of the backup. The traditional tape solution was used for everything since it was the only avenue to any recovery. As such it included recovering data, recovering systems, and recovering during a DR scenario. In the cloud the connected nature of the platform, and the on-demand provisioning change this viewpoint. Since we are now able to provision on demand it is generally preferable to store the deployment configuration rather than a full system image. Since we have multiple, well connected regions it is preferable to have a cold, warm, or hot standby site rather than recover from scratch in a disaster. As such, backup may be seen as primarily a way to recover data following corruption or accidental modification. Scenarios to consider for backup are:
 * Accidental data modification
 * Data corruption
 * Accidental configuration change
 Retention of backups as a form of archival should be avoided unless specifically called for in regulation. As a rule, backup copies do not aide compliance and in cases such as GDPR will often harm compliance. Archival of data will not be covered in this document and is considered a separate subject.
+
 ## <a name="IntroductionDisasterRecovery"></a>Disaster Recovery
+Disaster recovery involves copying an entire solution in a secondary location to protect against loss of the primary systems. The completeness and complexity of this copy varies based on two things, RPO and RTO.
+RPO
+: The Recovery Point Objective
+RTO
+: The Recovery Time Objective
 In cloud solutions, disaster recovery is very different to on-premises. Here, considerations such as speed of deployment and cost may affect the decision as to how you will recover. More than ever, the RPO and RTO requirements must be realistic and specific to the scenario. Where data is available in a replicated storage account, the difference between live continuity using clustering, booting a cold system, and building a new system from scratch might be around 30 minutes but many thousands of dollars in consumption. It is imperative, therefore to determine whether that 30 minute windows while a database server deploys are worth the cost of leaving such a system running. In data platforms especially it is likely the workload is batch and would need to re-start a processing job anyway. Additionally, the likelihood of a regional outage from a global cloud provider is lower than that of on-premises solutions. The security and change controls alone make accidental outages less likely while advanced facility design and provisioning ensure that failure is less likely and may be mitigated rather than allowing a failure. Design of the platform ensures that many components within region are resilient or can be swapped out more quickly than a full DR failover. Again, the RTO comes into play as we need to balance the speed and complexity of a failover with the speed and efficiency of the cloud provider recovering. Data should always be made available in a secondary region, or saved to a location off-cloud. In the case of data platforms, much of the data is build from systems of record anyway and so can potentially be recreated rather than restored. Again, cost will come into the equation as you need to determine whether it’s cheaper to recreate and reprocess data or to recover it after storing backup copies.
+
 ## <a name="IntroductionServiceAvailability"></a>Service Availability
 When working with geo-redundancy you must ensure that all services are available in the target region. Since not all services are available in every region, you may find that your data is available but the services to consume it are not in the partner region.
+
 # <a name="GeneralRequirements"></a>General Requirements
 This section will discuss whether or not backups are required for various components in a very generic way. This is intended to help you form a backup and recovery strategy for your own data that can then be translated to the services your data platform is actually using, whether Microsoft or third party. The common Microsoft components are detailed in later sections for implementation specifics.
 ![Data Platform Overview](images/DataMarts.png)
+
 ## <a name="SystemsOfRecord"></a>Systems Of Record
 ### <a name="SystemsOfRecordBackup"></a>Backup
 These data sources, such as existing SQL Databases, CRM, ERP and other systems should already have backups in place. They are generally line of business and the data is therefore neither transient nor trivial.
@@ -79,9 +92,11 @@ Generally, the ingest stage is transient and therefore there will not be any dat
 ### <a name="IngestDisasterRecovery"></a>Disaster Recovery
 DR for ingest services can be complex and is split into two sides. There are on premises components such as data gateways which need to be protected in line with your other on premises systems. This protects against an outage of your on premises data centre. Secondly is the protection of the cloud components. These need to maintain connectivity to data sources from the recovery data centre or region. Since there is no data within the service, it is often simpler to redeploy and configure in DR than to maintain a primary and secondary instance. 
 ## <a name="Store"></a>Store
+There are usually various stages of data within the data lake such as raw, curated, enriched etc. and each of these may need to be treated separately based on business value and how long they might take to recreate.
+
 ![Data Staging](images/DataStaging.png)
 
-There are usually various stages of data within the data lake such as raw, curated, enriched etc. and each of these may need to be treated separately based on business value and how long they might take to recreate. The definitions of these may also vary based on use-case. For instance raw data in an IoT scenario might be kept long term as a kind of “system of record” while in a batch system the raw incoming data is only needed until a curated copy is made and backed up.
+ The definitions of these may also vary based on use-case. For instance raw data in an IoT scenario might be kept long term as a kind of “system of record” while in a batch system the raw incoming data is only needed until a curated copy is made and backed up.
 The questions to ask here are:
 * Can I recreate the data from source later?
 * Will the source retain the data as long as I plan to keep this copy?
