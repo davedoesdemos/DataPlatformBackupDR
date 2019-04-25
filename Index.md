@@ -51,7 +51,7 @@ This guide aims to show effective ways of backing up and recovering a cloud data
 ![Data Platform Overview](images/DataMarts.png)
 
 ## <a name="CloudCompute"></a>Cloud Compute
-Understanding how to create a suitable strategy in the cloud requires an understanding of cloud compute itself. Your strategy will be a mixture of requirements and cost/performance. In the cloud, compute tends to be expensive while storage is cheap. As such it may often be more suitable to store multiple full and complete copies of data rather than incremental backup, or recreating data. 
+Understanding how to create a suitable strategy in the cloud requires an understanding of cloud compute itself. Your strategy will be a mixture of requirements and cost/performance. In the cloud, compute tends to be expensive while storage is cheap. As such it may often be more suitable to store multiple full and complete copies of data rather than incremental backup, or recreating data. For instance, with a data warehouse it might be that you choose not to back it up at all. Instead you may create a complete new set of tables in your storage every day and do a complete load daily. With this setup, a recovery would be as simple as reloading from a given set of files. Since storage is relatively cheap there is no problem keeping a month of daily versions of the full dataset in most instances.
 
 ## <a name="IntroductionArchive"></a>Archive
 Data platforms are often used for longer term retention of information which may have been removed from systems of record. For instance, consolidated sales information may be kept long term in a data platform even when the original data is removed. In this scenario, treat the archive data as a system in its own right and not as a backup of source data. This means you should take backups or snapshots of the archive data, as well as potentially replicating the archive to a recovery site.
@@ -79,6 +79,8 @@ Generally, the ingest stage is transient and therefore there will not be any dat
 ### <a name="IngestDisasterRecovery"></a>Disaster Recovery
 DR for ingest services can be complex and is split into two sides. There are on premises components such as data gateways which need to be protected in line with your other on premises systems. This protects against an outage of your on premises data centre. Secondly is the protection of the cloud components. These need to maintain connectivity to data sources from the recovery data centre or region. Since there is no data within the service, it is often simpler to redeploy and configure in DR than to maintain a primary and secondary instance. 
 ## <a name="Store"></a>Store
+![Data Staging](images/DataStaging.png)
+
 There are usually various stages of data within the data lake such as raw, curated, enriched etc. and each of these may need to be treated separately based on business value and how long they might take to recreate. The definitions of these may also vary based on use-case. For instance raw data in an IoT scenario might be kept long term as a kind of “system of record” while in a batch system the raw incoming data is only needed until a curated copy is made and backed up.
 The questions to ask here are:
 * Can I recreate the data from source later?
