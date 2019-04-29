@@ -165,6 +165,8 @@ Hot, cool, archive
 To read data in Archive storage, you must first change the tier of the blob to Hot or Cool. This process is known as rehydration and can take up to 15 hours to complete. Large blob sizes are recommended for optimal performance. Rehydrating several small blobs concurrently may add additional time.
 
 ### <a name="DataLakeStorageAccountBlobLifecycleManagement"></a>Blob Lifecycle Management
+![Blob Tiers](images/BlobTiers.png)
+
 Blob Storage lifecycle management (Preview) offers a rich, rule-based policy that you can use to transition your data to the best access tier and to expire data at the end of its lifecycle. See Manage the Azure Blob storage lifecycle to learn more. 
 
 Snapshots are at the blob level so probably best to integrate into Azure Data Factory pipelines
