@@ -62,7 +62,7 @@ Archival of data will generally be either for compliance, or for historical data
 
 ## <a name="IntroductionBackupAndRestore"></a>Backup and Restore
 Backup involves creating recovery points which can be used to restore data to a previous version should anything go wrong. Backup does not require data to be copied elsewhere or taken off site, but this is often done. Where data is copied to a secondary location, this is considered a disaster recovery solution for the backup system, not part of the backup system itself.
-Cloud platform backup and recovery is often a big change to traditional off-site tape backup. Firstly, we need to be clear of the purposes of the backup. The traditional tape solution was used for everything since it was the only avenue to any recovery. As such it included recovering data, recovering systems, and recovering during a DR scenario. In the cloud the connected nature of the platform, and the on-demand provisioning change this viewpoint. Since we are now able to provision on demand it is generally preferable to store the deployment configuration rather than a full system image. Since we have multiple, well connected regions it is preferable to have a cold, warm, or hot standby site rather than recover from scratch in a disaster. As such, backup may be seen as primarily a way to recover data following corruption or accidental modification. Scenarios to consider for backup are:
+Cloud platform backup and recovery is often a big change to traditional off-site tape backup. Firstly, we need to be clear of the purposes of the backup. The traditional tape solution was used for everything since it was the only avenue to any recovery. As such it included recovering data, recovering systems, and recovering during a DR scenario. In the cloud, the connected nature of the platform and the on-demand provisioning change this viewpoint. Since we are now able to provision on demand it is generally preferable to store the deployment configuration rather than a full system image. Since we have multiple, well connected regions it is preferable to have a cold, warm, or hot standby site rather than recover from scratch in a disaster. As such, backup may be seen as primarily a way to recover data following corruption or accidental modification. Scenarios to consider for backup are:
 * Accidental data modification
 * Data corruption
 * Accidental configuration change
@@ -128,12 +128,24 @@ Curated data has been prepared into our intended structure for consumption. This
 In the presentation stage, data may be separated into data warehouses or data marts. Here we would certainly wish to store backups and a replicated copy for DR unless the warehouse system itself is replicated. Often in fast moving data the whole warehouse may be reloaded every day and so a full set of data might be stored for each day and backed up.
 
 ## <a name="PrepAndTrain"></a>Prep and Train
+Prep and Train is used to model data either for warehousing or for machine learning purposes. This area can take one of two approaches; either an ad-hoc experimental approach, or an industrialised and tested approach. Generally you will end up with two stores here, one for experimentation early on in the project lifecycle, or for ongoing analysis and the other for refined processes. These areas can be treated differently for backup and DR purposes and it's likely that the RPO and RTO for each is going to be different.
+For the industrialised processes, you will usually have more strict SLAs in place since other processes and systems will almost certainly rely on them. Scripts and systems will change less often and will usually be managed through change control (e.g. ITIL) or DevOps (e.g. Agile).
+For the experimental processes things may be a bit more ad hoc and so backup might need to be in the hands of users such as data scientists rather than defined processes and technology. With new pipelines being created more often it is much harder to enforce backups.
 ### <a name="PrepAndTrainBackup"></a>Backup
+Scripts
+modeled data
+infrastructure configurations
 ### <a name="PrepAndTrainDisasterRecovery"></a>Disaster Recovery
 ## <a name="Model"></a>Model
+Within the model layer of the solution, data is generally ingested into a product where it can be queried. The decision of whether to back this up will depend on how data is generally ingested. Here, we have two options, often based on load times as to which is chosen:
+* Daily full ingest
+* Paritioned incremental
+In situations where a full daily ingest is carried out with all data, there is no reason to back up or replicate the system you're loading into. Here, you would simply create a folder on the data lake with a copy of the data for each load and this would constitute a full backup for the load. For disaster recovery, this data can either be loaded to a secondary system, or left on a replicated data lake ready to load in the event of a failover. The decision as to which would simply be a comparison of the load time with the RTO, taking into account any time to act following a disaster event.
+Where partitioned incremental loads take place, it might be necessary to back up in several places. Firstly you would need backups of the incremental data, since each partition might be loaded with different data each day and so it may be desirable to recovery a previous version. Secondly you may wish to backup within the solution itself, in order to roll back from a failed load. For disaster recovery you will need to replicate the data lake containing files to load. To shorten load times you may also wish to replicate the data solution itself to another location.
 ### <a name="ModelBackup"></a>Backup
 ### <a name="ModelDisasterRecovery"></a>Disaster Recovery
 ## <a name="Serve"></a>Serve
+Your serving layer may be extremely varied in terms of technology. Here we will assume you have caching and presentation (reporting) layers. 
 ### <a name="ServeBackup"></a>Backup
 ### <a name="ServeDisasterRecovery"></a>Disaster Recovery
 # <a name="SQL"></a>SQL
