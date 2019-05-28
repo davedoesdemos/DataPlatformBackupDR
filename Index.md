@@ -73,7 +73,7 @@ Disaster recovery involves copying an entire solution in a secondary location to
 
 **RPO**
 The Recovery Point Objective. This is the amount of data loss you're prepared to accept. In large data solutions it is likely that a day of data loss is acceptable since it can take time to replicate data to another location. We would then re-process the lost data to catch up on the DR site. For other systems it may be that no data loss is acceptable and so syncronous replication is necessary which may add cost and complexity.
-
+Whilst the data to be recovered from the primary site may allow for a more relaxed RPO, you should bear in mind that the actual objective for the recovered system might be to provide a more up to date system than the one being recovered. This is because reporting and analytics are constantly moving targets. Recovering a reporting solution exactly as it was 6 hours ago is not of any use when the report itself has a refresh of 4 hours. As such, it might be necessary to plan for processing some new data at the same time that older data is being recovered from backup or DR systems.
 **RTO**
 The Recovery Time Objective is the amount of time allowed before recovery is complete. For data platforms this will vary depending on usage. Longer RTOs are preferable since they allow reduction of cost and complexity.
 
@@ -129,12 +129,15 @@ In the presentation stage, data may be separated into data warehouses or data ma
 
 ## <a name="PrepAndTrain"></a>Prep and Train
 Prep and Train is used to model data either for warehousing or for machine learning purposes. This area can take one of two approaches; either an ad-hoc experimental approach, or an industrialised and tested approach. Generally you will end up with two stores here, one for experimentation early on in the project lifecycle, or for ongoing analysis and the other for refined processes. These areas can be treated differently for backup and DR purposes and it's likely that the RPO and RTO for each is going to be different.
+
 For the industrialised processes, you will usually have more strict SLAs in place since other processes and systems will almost certainly rely on them. Scripts and systems will change less often and will usually be managed through change control (e.g. ITIL) or DevOps (e.g. Agile).
+
 For the experimental processes things may be a bit more ad hoc and so backup might need to be in the hands of users such as data scientists rather than defined processes and technology. With new pipelines being created more often it is much harder to enforce backups.
 ### <a name="PrepAndTrainBackup"></a>Backup
-Scripts
-modeled data
-infrastructure configurations
+#### Scripts
+Generally speaking, scripts will be stored in a Git repository such as GitHub. This will allow for commits to be used as snapshots for backup since a commit is needed any time an item changes.
+#### modeled data
+#### infrastructure configurations
 ### <a name="PrepAndTrainDisasterRecovery"></a>Disaster Recovery
 ## <a name="Model"></a>Model
 Within the model layer of the solution, data is generally ingested into a product where it can be queried. The decision of whether to back this up will depend on how data is generally ingested. Here, we have two options, often based on load times as to which is chosen:
