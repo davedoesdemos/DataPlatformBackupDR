@@ -5,6 +5,7 @@
 
 * [Introduction](#Introduction)
   * [Cloud Compute](#CloudCompute)
+  * [Decoupled Infrastructure](#CloudComputeDecoupled)
   * [Archive](#IntroductionArchive)
   * [Backup and Restore](#IntroductionBackupAndRestore)
   * [Disaster Recovery](#IntroductionDisasterRecovery)
@@ -22,14 +23,13 @@
     * [Curated](#StoreCurated)
     * [Presentation](#StorePresentation)
   * [Prep and Train](#PrepAndTrain)
-    * [Backup](#PrepAndTrainBackup)
-    * [Disaster Recovery](#PrepAndTrainDisasterRecovery)
+    * [Scripts](PrepAndTrainScripts)
+    * [Modeled Data](PrepAndTrainModeledData)
+    * [Infrastructure Configurations](PrepAndTrainInfrastructureConfigurations)
   * [Model](#Model)
-    * [Backup](#ModelBackup)
-    * [Disaster Recovery](#ModelDisasterRecovery)
   * [Serve](#Serve)
-    * [Backup](#ServeBackup)
-    * [Disaster Recovery](#ServeDisasterRecovery)
+    * [Cache](#ServeCache)
+    * [Presentation](#ServePresentation)
 * [SQL](#SQL)
   * [SQL Managed Instance](#SQLSQLManagedInstance)
   * [SQL Server](#SQLSQLServer)
@@ -55,6 +55,10 @@ This guide aims to show effective ways of backing up and recovering a cloud data
 
 ## <a name="CloudCompute"></a>Cloud Compute
 Understanding how to create a suitable strategy in the cloud requires an understanding of cloud compute itself. Your strategy will be a mixture of requirements and cost/performance. In the cloud, compute tends to be expensive while storage is cheap. As such it may often be more suitable to store multiple full and complete copies of data rather than incremental backup, or recreating data. For instance, with a data warehouse it might be that you choose not to back it up at all. Instead you may create a complete new set of tables in your storage every day and do a complete load daily. With this setup, a recovery would be as simple as reloading from a given set of files. Since storage is relatively cheap there is no problem keeping a month of daily versions of the full dataset in most instances.
+
+## <a name="CloudComputeDecoupled"></a>Decoupled Infrastructure
+In cloud scenarios is it often useful to decouple infrastructure to allow for underlying systems to change without complex reconfiguration. This is most often done using global load balancers in analytical data solutions. Real time solutions such as IoT and integration platforms may also achieve this using service bus technology for guaranteed delivery of data.
+![globalloadbalance.png](images/globalloadbalance.png)
 
 ## <a name="IntroductionArchive"></a>Archive
 Data platforms are often used for longer term retention of information which may have been removed from systems of record. For instance, consolidated sales information may be kept long term in a data platform even when the original data is removed. In this scenario, treat the archive data as a system in its own right and not as a backup of source data. This means you should take backups or snapshots of the archive data, as well as potentially replicating the archive to a recovery site.
@@ -136,24 +140,41 @@ Prep and Train is used to model data either for warehousing or for machine learn
 For the industrialised processes, you will usually have more strict SLAs in place since other processes and systems will almost certainly rely on them. Scripts and systems will change less often and will usually be managed through change control (e.g. ITIL) or DevOps (e.g. Agile).
 
 For the experimental processes things may be a bit more ad hoc and so backup might need to be in the hands of users such as data scientists rather than defined processes and technology. With new pipelines being created more often it is much harder to enforce backups.
-### <a name="PrepAndTrainBackup"></a>Backup
-#### Scripts
-Generally speaking, scripts will be stored in a Git repository such as GitHub. This will allow for commits to be used as snapshots for backup since a commit is needed any time an item changes.
-#### modeled data
-#### infrastructure configurations
-### <a name="PrepAndTrainDisasterRecovery"></a>Disaster Recovery
+
+### <a name="PrepAndTrainScripts"></a>Scripts
+
+Generally speaking, scripts will be stored in a Git repository such as GitHub. This will allow for commits to be used as snapshots for backup since a commit is needed any time an item changes. Using this technique, branches and merges may also be used to prevent issues from forming, and the new branch applied to a development copy of the platform prior to being merged into production.
+Git repositories can be cloned to another host for disaster recovery, although you will need to ensure that at least one copy is blocked from deletion to protect against accidental human error removing the repository.
+
+### <a name="PrepAndTrainModeledData"></a>Modeled Data
+
+When data has been processed and modeled its value will increase. There should be a backup of this data since it is likely to be a direct contributor to the final consumption of the information. Modeled data may be processed and stored as files on the data lake. In this scenario, it is common to see the data lake used as a form of backup by creating a new and complete set of data each time an update is completed. This means that any complete data set can be loaded at any time to recover to a point in time. Alternatively, if the data is loaded into a semantic layer system, that system may provide for point in time recoveries for the data natively.
+
+### <a name="PrepAndTrainInfrastructureConfigurations"></a>Infrastructure Configurations
+
+The prep and train stage often has related infratsructure and systems. These may be backed up using traditional methods if they are IaaS based. When using PaaS or SaaS solutions here, a backup of the configuration and deployment script would allow recreation of the environment in a recovery scenario, or following a change that has broken the solution. Many solutions here will have JSON based configurations and deployment scripts and so should be relatively easy to back up using a solution such as Git alongside the scripts.
+
 ## <a name="Model"></a>Model
 Within the model layer of the solution, data is generally ingested into a product where it can be queried. The decision of whether to back this up will depend on how data is generally ingested. Here, we have two options, often based on load times as to which is chosen:
+
 * Daily full ingest
 * Paritioned incremental
+
 In situations where a full daily ingest is carried out with all data, there is no reason to back up or replicate the system you're loading into. Here, you would simply create a folder on the data lake with a copy of the data for each load and this would constitute a full backup for the load. For disaster recovery, this data can either be loaded to a secondary system, or left on a replicated data lake ready to load in the event of a failover. The decision as to which would simply be a comparison of the load time with the RTO, taking into account any time to act following a disaster event.
-Where partitioned incremental loads take place, it might be necessary to back up in several places. Firstly you would need backups of the incremental data, since each partition might be loaded with different data each day and so it may be desirable to recovery a previous version. Secondly you may wish to backup within the solution itself, in order to roll back from a failed load. For disaster recovery you will need to replicate the data lake containing files to load. To shorten load times you may also wish to replicate the data solution itself to another location.
-### <a name="ModelBackup"></a>Backup
-### <a name="ModelDisasterRecovery"></a>Disaster Recovery
+Where partitioned incremental loads take place, it might be necessary to back up in several places. Firstly you would need backups of the incremental data, since each partition might be loaded with different data each day and so it may be desirable to recover a previous version. Secondly you may wish to backup within the solution itself, in order to roll back from a failed load. For disaster recovery you will need to replicate the data lake containing files to load. To shorten load times you may also wish to replicate the data solution itself to another location.
+
 ## <a name="Serve"></a>Serve
+
 Your serving layer may be extremely varied in terms of technology. Here we will assume you have caching and presentation (reporting) layers. 
-### <a name="ServeBackup"></a>Backup
-### <a name="ServeDisasterRecovery"></a>Disaster Recovery
+
+### <a name="ServeCache"></a>Cache
+
+A caching layer will allow for many more users to access the data in parallel, at the cost of some flexibility. Since data will be reloaded every day it is unlikely that you will need to back up this layer. Data will be available from the modeling layer and so can be rolled back there if necessary. For disaster recovery it is likely that you would backup the deployment and configuration scripts in Git and redeploy them before reloading data. This may be product dependent, and so in some scenarios a backup of the cached data may be advisable.
+
+### <a name="ServePresentation"></a>Presentation
+
+The presentation layer can vary widely. Here we will assume a reporting platfrom. In this scenario, the report source should be backed up and version controlled using a supported technology such as Git. For Disaster recovery, you may need to redeploy reports to another reporting platform in another region, and potentially re-point any data sources to the new location. It might be possible to use technology such as global load balancers (in Azure this would be Traffic Manager) to handle URI changes between regions during a failover.
+
 # <a name="SQL"></a>SQL
 ## <a name="SQLSQLManagedInstance"></a>SQL Managed Instance
 ## <a name="SQLSQLServer"></a>SQL Server
