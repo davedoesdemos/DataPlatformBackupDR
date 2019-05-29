@@ -74,6 +74,9 @@ Disaster recovery involves copying an entire solution in a secondary location to
 **RPO**
 The Recovery Point Objective. This is the amount of data loss you're prepared to accept. In large data solutions it is likely that a day of data loss is acceptable since it can take time to replicate data to another location. We would then re-process the lost data to catch up on the DR site. For other systems it may be that no data loss is acceptable and so syncronous replication is necessary which may add cost and complexity.
 Whilst the data to be recovered from the primary site may allow for a more relaxed RPO, you should bear in mind that the actual objective for the recovered system might be to provide a more up to date system than the one being recovered. This is because reporting and analytics are constantly moving targets. Recovering a reporting solution exactly as it was 6 hours ago is not of any use when the report itself has a refresh of 4 hours. As such, it might be necessary to plan for processing some new data at the same time that older data is being recovered from backup or DR systems.
+
+Flexibility may be used here to reduce costs. If the _really_ important information is the last four hours, then your recovery may set one RPO/RTO for that information and a different one for historic data. This may be sufficient to show the consumers of the information what they need in the short term before getting everything back later on.
+
 **RTO**
 The Recovery Time Objective is the amount of time allowed before recovery is complete. For data platforms this will vary depending on usage. Longer RTOs are preferable since they allow reduction of cost and complexity.
 
