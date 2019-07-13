@@ -56,11 +56,12 @@
 
 # <a name="Introduction"></a>Introduction
 
-This guide aims to show effective ways of backing up and recovering a cloud data platform, as well as how to recover in a regional outage or disaster recovery situation.
+This guide aims to show effective ways of backing up and recovering a cloud data platform, as well as how to recover in a regional outage or disaster recovery situation. Data loss prevention and business continuity can be extremely important once a data platform becomes line of business. Implementing this in a cost effective manner which will allow recovery with an impact appropriate to your business can be challenging. This guide will familiarise you with the concepts and trade offs and prepare you to design an effective solution.
 
-## <a name="TheDataPlatform></a>The Data Platform
+## <a name="TheDataPlatform"></a>The Data Platform
 
-In this instance cloud data platform refers specifically to cloud data warehousing using data lake and Data Factory such as in the image below.
+In this instance cloud data platform refers to cloud data warehousing using data lake and Data Factory such as in the image below. While this is a specific solution, the concepts will translate well to other scenarios including realtime data processing scenarios using a data lake architecture.
+
 ![Data Platform Overview](images/DataMarts.png)
 
 # <a name="DataProtectionConcepts"></a>Data Protection Concepts
