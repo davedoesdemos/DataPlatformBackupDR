@@ -215,6 +215,27 @@ Curated data has been prepared into our intended structure for consumption. This
 
 In the presentation stage, data may be separated into data warehouses or data marts. Here we would certainly wish to store backups and a replicated copy for DR unless the warehouse system itself is replicated. Often in fast moving data the whole warehouse may be reloaded every day and so a full set of data might be stored for each day and backed up.
 
+# <a name="DataLake"></a>Data Lake
+## <a name="DataLakeStorageAccount"></a>Storage Account (blob)
+[https://azure.microsoft.com/en-us/services/storage/blobs/](https://azure.microsoft.com/en-us/services/storage/blobs/)
+![Blob Tiers](images/BlobTiers.png)
+Hot, cool, archive
+To read data in Archive storage, you must first change the tier of the blob to Hot or Cool. This process is known as rehydration and can take up to 15 hours to complete. Large blob sizes are recommended for optimal performance. Rehydrating several small blobs concurrently may add additional time.
+
+### <a name="DataLakeStorageAccountBlobLifecycleManagement"></a>Blob Lifecycle Management
+
+
+Blob Storage lifecycle management (Preview) offers a rich, rule-based policy that you can use to transition your data to the best access tier and to expire data at the end of its lifecycle. See Manage the Azure Blob storage lifecycle to learn more. 
+
+Snapshots are at the blob level so probably best to integrate into Azure Data Factory pipelines
+
+## <a name="DataLakeStorageAccountAzureDataLakeStoreGen2"></a>Azure Data Lake Store Gen 2
+Azure Data Lake Store Gen 2 does not yet support soft delete or snapshots
+## <a name="DataLakeStorageAccountAzureDataLakeStoreGen1"></a>Azure Data Lake Store Gen 1
+Does not have GRS!
+No snapshots
+Must copy to Blob for backup capability
+
 # <a name="PrepAndTrain"></a>Prep and Train
 
 Prep and Train is used to model data either for warehousing or for machine learning purposes. This area can take one of two approaches; either an ad-hoc experimental approach, or an industrialised and tested approach. Generally you will end up with two stores here, one for experimentation early on in the project lifecycle, or for ongoing analysis and the other for refined processes. These areas can be treated differently for backup and DR purposes and it's likely that the RPO and RTO for each is going to be different.
@@ -268,26 +289,7 @@ The presentation layer can vary widely. Here we will assume a reporting platfrom
 ## <a name="SQLAzureSQLDatabase"></a>Azure SQL Database
 
 
-# <a name="DataLake"></a>Data Lake
-## <a name="DataLakeStorageAccount"></a>Storage Account (blob)
-[https://azure.microsoft.com/en-us/services/storage/blobs/](https://azure.microsoft.com/en-us/services/storage/blobs/)
-![Blob Tiers](images/BlobTiers.png)
-Hot, cool, archive
-To read data in Archive storage, you must first change the tier of the blob to Hot or Cool. This process is known as rehydration and can take up to 15 hours to complete. Large blob sizes are recommended for optimal performance. Rehydrating several small blobs concurrently may add additional time.
 
-### <a name="DataLakeStorageAccountBlobLifecycleManagement"></a>Blob Lifecycle Management
-
-
-Blob Storage lifecycle management (Preview) offers a rich, rule-based policy that you can use to transition your data to the best access tier and to expire data at the end of its lifecycle. See Manage the Azure Blob storage lifecycle to learn more. 
-
-Snapshots are at the blob level so probably best to integrate into Azure Data Factory pipelines
-
-## <a name="DataLakeStorageAccountAzureDataLakeStoreGen2"></a>Azure Data Lake Store Gen 2
-Azure Data Lake Store Gen 2 does not yet support soft delete or snapshots
-## <a name="DataLakeStorageAccountAzureDataLakeStoreGen1"></a>Azure Data Lake Store Gen 1
-Does not have GRS!
-No snapshots
-Must copy to Blob for backup capability
 # <a name="HDInsight"></a>HDInsight
 “stateless”
 Scripted creation – Git versioning
