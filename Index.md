@@ -68,6 +68,8 @@ In this instance cloud data platform refers to cloud data warehousing using data
 
 ## <a name="SLA"></a>SLA
 
+A good SLA is the start of any recovery solution. Ideally the SLA should be known prior to designing an availability solution. At one end of the scale would be a solution where no recovery is needed since re-implementation could be fast enough for the business use. At the other end of the scale, a sales organisation may depend on reporting and analytics to the point that money and revenue will be lost if the data platform is unavailable for any length of time.
+
 **RPO**
 The Recovery Point Objective. This is the amount of data loss you're prepared to accept. In large data solutions it is likely that a day of data loss is acceptable since it can take time to replicate data to another location. We would then re-process the lost data to catch up on the DR site. For other systems it may be that no data loss is acceptable and so syncronous replication is necessary which may add cost and complexity.
 Whilst the data to be recovered from the primary site may allow for a more relaxed RPO, you should bear in mind that the actual objective for the recovered system might be to provide a more up to date system than the one being recovered. This is because reporting and analytics are constantly moving targets. Recovering a reporting solution exactly as it was 6 hours ago is not of any use when the report itself has a refresh of 4 hours. As such, it might be necessary to plan for processing some new data at the same time that older data is being recovered from backup or DR systems.
