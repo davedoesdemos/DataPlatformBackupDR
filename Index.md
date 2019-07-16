@@ -84,7 +84,9 @@ For the data platform, RTO and RPO may be complicated due to the pipeline nature
 ## <a name="IntroductionBackupAndRestore"></a>Backup and Restore
 
 Backup involves creating recovery points which can be used to restore data to a previous version should anything go wrong. Backup does not require data to be copied elsewhere or taken off site, but this is often done. Where data is copied to a secondary location, this is considered a disaster recovery solution for the backup system, not part of the backup system itself.
-Cloud platform backup and recovery is often a big change to traditional off-site tape backup. Firstly, we need to be clear of the purposes of the backup. The traditional tape solution was used for everything since it was the only avenue to any recovery. As such it included recovering data, recovering systems, and recovering during a DR scenario. In the cloud, the connected nature of the platform and the on-demand provisioning change this viewpoint. Since we are now able to provision on demand it is generally preferable to store the deployment configuration rather than a full system image. Since we have multiple, well connected regions it is preferable to have a cold, warm, or hot standby site rather than recover from scratch in a disaster. As such, backup may be seen as primarily a way to recover data following corruption or accidental modification. Scenarios to consider for backup are:
+Cloud platform backup and recovery is often a big change to traditional off-site tape backup. Firstly, we need to be clear of the purposes of the backup. The traditional tape solution was used for everything since it was the only avenue to any recovery. As such it included recovering data, recovering systems, and recovering during a DR scenario. In the cloud, the connected nature of the platform and the on-demand provisioning change this viewpoint. Since we are now able to provision on demand it is generally preferable to store the deployment configuration rather than a full system image. Since we have multiple, well connected regions it is preferable to have a cold, warm, or hot standby site rather than recover from scratch in a disaster. As such, backup may be seen as primarily a way to recover data following corruption or accidental modification. 
+
+Scenarios to consider for backup are:
 * Accidental data modification
 * Data corruption
 * Accidental configuration change
@@ -96,7 +98,12 @@ Disaster recovery involves recovering an entire solution in a secondary location
 
 In cloud solutions, disaster recovery is sometimes very different to on-premises. Here, considerations such as speed of deployment and cost may affect the decision as to how you will recover. More than ever, the RPO and RTO requirements must be realistic and specific to the scenario. Where data is available in a replicated storage account, the difference between live continuity using clustering, booting a cold system, and building a new system from scratch might be around 30 minutes but many thousands of dollars in consumption. It is imperative, therefore to determine whether that 30 minute window while a database server deploys are worth the cost of leaving such a system running. In data platforms especially it is likely the workload is batch and would need to re-start a processing job anyway. Additionally, the likelihood of a regional outage from a global cloud provider is lower than that of on-premises solutions. The security and change controls alone make accidental outages less likely while advanced facility design and provisioning ensure that failure is less likely and may be mitigated rather than allowing a failure. Design of the platform ensures that many components within region are resilient or can be swapped out more quickly than a full DR failover. Again, the RTO comes into play as we need to balance the speed and complexity of a failover with the speed and efficiency of the cloud provider recovering. Data should always be made available in a secondary region, or saved to a location off-cloud. In the case of data platforms, much of the data is build from systems of record anyway and so can potentially be recreated rather than restored. Again, cost will come into the equation as you need to determine whether it’s cheaper to recreate and reprocess data or to recover it after storing backup copies.
 
-Because of the above, we would generally separate the concepts of data recovery and system recovery for cloud DR. System recovery may be a script to install new systems, while data will need to be replicated or copied fresh in the recovery systems.
+Because of the above, we would generally separate the concepts of data recovery and system recovery for cloud DR. System recovery may be a script to install new systems, while data will need to be replicated or copied fresh in the recovery systems. 
+
+Scenarios to consider for cloud disaster recovery are:
+* Extended Regional Outage
+* Administrative errors
+* Region changes (planned moves to a new region)
 
 ## <a name="IntroductionArchive"></a>Archive
 
@@ -104,11 +111,24 @@ Data platforms are often used for longer term retention of information which may
 Archival of data will generally be either for compliance, or for historical data purposes. Before creating an archive you should have a clear reason for keeping data, as with all lifecycle management processes. Also ensure that you understand when the data will be removed and put in place processes to remove it at that time.
 ![Archive](images/archive.png)
 
+Scenarios to consider archiving are:
+* Regulatory Compliance
+* Historical data for analytics
+* Reduced cost/impact on systems of record
+
 # <a name="DesignConsiderations"></a>Design Considerations
 
 ## <a name="CloudCompute"></a>Cloud Compute
 
-Understanding how to create a suitable strategy in the cloud requires an understanding of cloud compute itself. Your strategy will be a mixture of requirements and cost/performance. In the cloud, compute tends to be expensive while storage is cheap. As such it may often be more suitable to store multiple full and complete copies of data rather than incremental backup, or recreating data. For instance, with a data warehouse it might be that you choose not to back it up at all. Instead you may create a complete new set of tables in your storage every day and do a complete load daily. With this setup, a recovery would be as simple as reloading from a given set of files. Since storage is relatively cheap there is no problem keeping a month of daily versions of the full dataset in most instances.
+Understanding how to create a suitable strategy in the cloud requires an understanding of cloud compute itself.
+Differences to on-premises solutions are:
+* Cost is metered rather than fixed
+* Deployment can be instant rather than planned
+* Storage can be cheaper
+* Cloud systems can scale down and up easily
+* Globally distributed data centres already exist
+
+Your strategy will be a mixture of requirements and cost/performance. In the cloud, compute tends to be expensive while storage is cheap relatively speaking. As such it may often be more suitable to store multiple full and complete copies of data rather than incremental backup, or recreating data. For instance, with a data warehouse it might be that you choose not to back it up at all. Instead you may create a complete new set of tables in your storage every day and do a complete load daily. With this setup, a recovery would be as simple as reloading from a given set of files. Since storage is relatively cheap there is no problem keeping a month of daily versions of the full dataset in most instances.
 
 ## <a name="costTimeTradeoff"></a>Cost Time Tradeoff
 
@@ -131,7 +151,8 @@ In cloud scenarios is it often useful to decouple infrastructure to allow for un
 
 ## <a name="IntroductionRegionalServiceAvailability"></a>Regional Service Availability
 
-When working with geo-redundancy you must ensure that all services are available in the target region. Since not all services are available in every region, you may find that your data is available but the services to consume it are not in the partner region. This would be a disaster in and of itself and so must be avoided to ensure recovery is possible.
+When working with geo-redundancy you must ensure that all services are available in the target region. Since not all services are available in every region, you may find that your data is available but the services to consume it are not in the partner region. This would be a disaster in and of itself and so must be avoided to ensure recovery is possible. Use the 
+[Service Availability by Region](https://azure.microsoft.com/en-gb/global-infrastructure/services/) page to check availability of your services.
 
 # <a name="GeneralRequirements"></a>General Requirements
 
