@@ -139,7 +139,7 @@ When dealing with data recovery there is a tradeoff between processing time and 
 
 The answer to these questions will vary based on the unique requirements of your data set. There are several stages of data processing in most data platforms, and the manner in which data arrives (batch, realtime) and the frequency and size will affect this decision. If you have large quantities of data arriving daily the decision may be different to small quantities trickling in. similarly, highly processed data may have a different solution compared to data with minimal transformation requirements.
 
-To determine the best solution, pick a timespan to calculate over. Choose this based on how long the data will be useful.
+To determine the best solution, pick a timespan to calculate over. Choose this based on how long the data will be useful. Next, calculate how much it will cost to re-produce that data and how much it will cost to store that data for the timespan it will be useful. Also, record how long it takes to re-process the data. These calculations will give you a good indicator of which is the best solution.
 
 **Raw Data** For raw data, you need to balance whether you can ingest into the recovery site in a reasonable time without adversely impacting systems of record (Production data systems)
 
