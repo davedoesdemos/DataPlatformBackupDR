@@ -143,16 +143,6 @@ Generally, the ingest stage is transient and therefore there will not be any dat
 
 DR for ingest services can be complex and is split into two sides. There are on premises components such as data gateways which need to be protected in line with your other on premises systems. This protects against an outage of your on premises data centre. Secondly is the protection of the cloud components. These need to maintain connectivity to data sources from the recovery data centre or region. Since there is no data within the service, it is often simpler to redeploy and configure in DR than to maintain a primary and secondary instance.
 
-## Data Factory
-
-Config in Github
-
-### Integration Runtime
-
-Second copy
-
-### Pipelines
-
 # Store
 
 There are usually various stages of data within the data lake such as raw, curated, enriched etc. and each of these may need to be treated separately based on business value and how long they might take to recreate.
