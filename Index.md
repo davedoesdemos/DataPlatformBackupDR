@@ -101,7 +101,7 @@ When dealing with data recovery there is a tradeoff between processing time and 
 * Is it possible to re-process all data within RTO whether on primary or recovery site
 * Is it cheaper to re-process, or replicate data and restore it?
 
-The answer to these questions will vary based on the unique requirements of your data set. There are several stages of data processing in most data platforms, and the manner in which data arrives (batch, realtime) and the frequency and size will affect this decision. If you have large quantities of data arriving daily the decision may be different to small quantities trickling in. similarly, highly processed data may have a different solution compared to data with minimal transformation requirements.
+The answer to these questions will vary based on the unique requirements of your data set. There are several stages of data processing in most data platforms, and the manner in which data arrives (batch, realtime) as well as the frequency and size of that data will affect this decision. If you have large quantities of data arriving daily the decision may be different to small quantities trickling in. similarly, highly processed data may have a different solution compared to data with minimal transformation requirements.
 
 To determine the best solution, pick a timespan to calculate over. Choose this based on how long the data will be useful. Next, calculate how much it will cost to re-produce that data and how much it will cost to store that data for the timespan it will be useful. Also, record how long it takes to re-process the data. These calculations will give you a good indicator of which is the best solution.
 
@@ -184,31 +184,6 @@ Curated data has been prepared into our intended structure for consumption. This
 
 In the presentation stage, data may be separated into data warehouses or data marts. Here we would certainly wish to store backups and a replicated copy for DR unless the warehouse system itself is replicated. Often in fast moving data the whole warehouse may be reloaded every day and so a full set of data might be stored for each day and backed up.
 
-# Data Lake
-
-## Storage Account (blob)
-
-[https://azure.microsoft.com/en-us/services/storage/blobs/](https://azure.microsoft.com/en-us/services/storage/blobs/)
-![Blob Tiers](images/BlobTiers.png)
-Hot, cool, archive
-To read data in Archive storage, you must first change the tier of the blob to Hot or Cool. This process is known as rehydration and can take up to 15 hours to complete. Large blob sizes are recommended for optimal performance. Rehydrating several small blobs concurrently may add additional time.
-
-### Blob Lifecycle Management
-
-Blob Storage lifecycle management (Preview) offers a rich, rule-based policy that you can use to transition your data to the best access tier and to expire data at the end of its lifecycle. See Manage the Azure Blob storage lifecycle to learn more.
-
-Snapshots are at the blob level so probably best to integrate into Azure Data Factory pipelines
-
-## Azure Data Lake Store Gen 2
-
-Azure Data Lake Store Gen 2 does not yet support soft delete or snapshots
-
-## Azure Data Lake Store Gen 1
-
-Does not have GRS!
-No snapshots
-Must copy to Blob for backup capability
-
 # Prep and Train
 
 Prep and Train is used to model data either for warehousing or for machine learning purposes. This area can take one of two approaches; either an ad-hoc experimental approach, or an industrialised and tested approach. Generally you will end up with two stores here, one for experimentation early on in the project lifecycle, or for ongoing analysis and the other for refined processes. These areas can be treated differently for backup and DR purposes and it's likely that the RPO and RTO for each is going to be different.
@@ -228,7 +203,7 @@ When data has been processed and modeled its value will increase. There should b
 
 ## Infrastructure Configurations
 
-The prep and train stage often has related infratsructure and systems. These may be backed up using traditional methods if they are IaaS based. When using PaaS or SaaS solutions here, a backup of the configuration and deployment script would allow recreation of the environment in a recovery scenario, or following a change that has broken the solution. Many solutions here will have JSON based configurations and deployment scripts and so should be relatively easy to back up using a solution such as Git alongside the scripts.
+The prep and train stage often has related infrastructure and systems. These may be backed up using traditional methods if they are IaaS based. When using PaaS or SaaS solutions here, a backup of the configuration and deployment script would allow recreation of the environment in a recovery scenario, or following a change that has broken the solution. Many solutions here will have JSON based configurations and deployment scripts and so should be relatively easy to back up using a solution such as Git alongside the scripts.
 
 # Model
 
@@ -248,45 +223,6 @@ Your serving layer may be extremely varied in terms of technology. Here we will 
 
 A caching layer will allow for many more users to access the data in parallel, at the cost of some flexibility. Since data will be reloaded every day it is unlikely that you will need to back up this layer. Data will be available from the modeling layer and so can be rolled back there if necessary. For disaster recovery it is likely that you would backup the deployment and configuration scripts in Git and redeploy them before reloading data. This may be product dependent, and so in some scenarios a backup of the cached data may be advisable.
 
-## Presentation
+## Presentation Layer
 
 The presentation layer can vary widely. Here we will assume a reporting platfrom. In this scenario, the report source should be backed up and version controlled using a supported technology such as Git. For Disaster recovery, you may need to redeploy reports to another reporting platform in another region, and potentially re-point any data sources to the new location. It might be possible to use technology such as global load balancers (in Azure this would be Traffic Manager) to handle URI changes between regions during a failover.
-
-# SQL
-
-## SQL Managed Instance
-
-## SQL Server
-
-## Azure SQL Database
-
-# HDInsight
-
-“stateless”
-Scripted creation – Git versioning
-Data lives on lake
-
-# Azure Databricks
-
-“stateless”
-Scripted creation – Git versioning
-Data lives on lake
-Git integration for notebooks
-
-# SQL Data Warehouse
-
-[https://docs.microsoft.com/en-us/azure/sql-data-warehouse/backup-and-restore](https://docs.microsoft.com/en-us/azure/sql-data-warehouse/backup-and-restore)
-
-auto snapshots
-user snapshots
-geo replication
-
-# Azure Analysis Services
-
-Backup to geo storage and restore
-
-# Power BI
-
-Backup files
-Git for version control
-redeploy
