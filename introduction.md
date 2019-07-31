@@ -12,6 +12,10 @@ ms.subservice: operate
 
 # Introduction
 
+Backup and disaster recovery are every bit as important in the cloud as on premises. Even when using PaaS services which are fully managed, the customer is often responsible for their own data and recovery processes. When using SaaS services backup and DR can sometimes be included but you must still check they are enabled and suitable for your needs. This guide explains the important considerations and concepts for creating a backup and recovery policy in the cloud.
+
+See also more detailed information relating to [data platform backup and recovery](dataplatformbackupdr.md)
+
 # Data Protection Concepts
 
 ## SLA
@@ -42,6 +46,18 @@ Scenarios to consider for backup are:
 
 Retention of backups as a form of archival should be avoided unless specifically called for in regulation. As a rule, backup copies do not aide compliance and in cases such as GDPR will often harm compliance. Archival of data will not be covered in this document and is considered a separate subject.
 
+## Archive
+
+Data platforms are often used for longer term retention of information which may have been removed from systems of record. For instance, consolidated sales information may be kept long term in a data platform even when the original data is removed. In this scenario, treat the archive data as a system in its own right and not as a backup of source data. This means you should take backups or snapshots of the archive data, as well as potentially replicating the archive to a recovery site.
+Archival of data will generally be either for compliance, or for historical data purposes. Before creating an archive you should have a clear reason for keeping data, as with all lifecycle management processes. Also ensure that you understand when the data will be removed and put in place processes to remove it at that time.
+![Archive](images/archive.png)
+
+Scenarios to consider archiving are:
+
+* Regulatory Compliance
+* Historical data for analytics
+* Reduced cost/impact on systems of record
+
 ## Disaster Recovery
 
 Disaster recovery involves recovering an entire solution in a secondary location following loss of the primary site. Traditionally this would have required a second copy of the system (server and networking etc.) and the data in the secondary location.
@@ -59,18 +75,6 @@ Scenarios to consider for cloud disaster recovery are:
 ## Business Continuity
 
 Business continuity performs the same role as disaster recovery above, but is designed in such a way as to ensure there is no loss of service when a region becomes unavailable for any reason. These scenarios will generally cost significantly more, or be more complex and so should be implemented only where a genuine requirement is defined.
-
-## Archive
-
-Data platforms are often used for longer term retention of information which may have been removed from systems of record. For instance, consolidated sales information may be kept long term in a data platform even when the original data is removed. In this scenario, treat the archive data as a system in its own right and not as a backup of source data. This means you should take backups or snapshots of the archive data, as well as potentially replicating the archive to a recovery site.
-Archival of data will generally be either for compliance, or for historical data purposes. Before creating an archive you should have a clear reason for keeping data, as with all lifecycle management processes. Also ensure that you understand when the data will be removed and put in place processes to remove it at that time.
-![Archive](images/archive.png)
-
-Scenarios to consider archiving are:
-
-* Regulatory Compliance
-* Historical data for analytics
-* Reduced cost/impact on systems of record
 
 # Design Considerations
 
