@@ -20,11 +20,6 @@ In this instance cloud data platform refers to cloud data warehousing using data
 
 ![Data Platform Overview](images/DataMarts.png)
 
-# General Requirements
-
-This section will discuss whether or not backups are required for various components in a very generic way. This is intended to help you form a backup and recovery strategy for your own data that can then be translated to the services your data platform is actually using, whether Microsoft or third party. The common Microsoft components are detailed in later sections for implementation specifics.
-![Data Platform Overview](images/DataMarts.png)
-
 # Systems Of Record
 
 ## Backup
